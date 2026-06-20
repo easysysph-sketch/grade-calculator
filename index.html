@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Grade Calculator</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #657184;
+      --line: #d9e2ec;
+      --page: #f3f7fb;
+      --panel: #ffffff;
+      --accent: #0f766e;
+      --accent-dark: #0b5f59;
+      --danger: #b42318;
+      --warning: #b45309;
+      --pass-bg: #ddf7ee;
+      --fail-bg: #ffe7e3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, #e8f6f4 0%, var(--page) 42%, #fff4e5 100%);
+    }
+
+    main {
+      width: min(980px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 34px 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.75fr);
+      overflow: hidden;
+      min-height: 620px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 45px rgba(23, 32, 51, 0.14);
+    }
+
+    .left,
+    .right {
+      padding: 28px;
+    }
+
+    .left {
+      border-right: 1px solid var(--line);
+    }
+
+    .right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #f9fbfd;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .pill {
+      min-width: 86px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #c8ebe5;
+      color: var(--accent-dark);
+      background: #effaf8;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .student-grid {
+      display: grid;
+      grid-template-columns: 1fr 150px;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #334155;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #ffffff;
+      font: inherit;
+    }
+
+    input:focus {
+      outline: 3px solid rgba(15, 118, 110, 0.18);
+      border-color: var(--accent);
+    }
+
+    .table {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .head,
+    .score-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) minmax(86px, 130px) 42px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .head {
+      color: #475569;
+      background: #eef3f8;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .score-row {
+      border-top: 1px solid var(--line);
+    }
+
+    .remove {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--danger);
+      background: #fff8f7;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .secondary {
+      color: var(--ink);
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .secondary:hover {
+      background: #f1f5f9;
+    }
+
+    .warning {
+      min-height: 22px;
+      margin-top: 12px;
+      color: var(--warning);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .meter {
+      display: grid;
+      place-items: center;
+      width: min(238px, 100%);
+      aspect-ratio: 1;
+      margin: 0 auto 22px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0deg, var(--accent) var(--angle), #e4ebf2 var(--angle), #e4ebf2 360deg);
+    }
+
+    .meter-inner {
+      display: grid;
+      place-items: center;
+      width: 76%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #ffffff;
+      text-align: center;
+    }
+
+    .average {
+      font-size: clamp(2.7rem, 8vw, 4.25rem);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .average-label {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .remark {
+      padding: 16px;
+      border-radius: 8px;
+      color: var(--accent-dark);
+      background: var(--pass-bg);
+      font-size: 1.25rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .remark.failed {
+      color: var(--danger);
+      background: var(--fail-bg);
+    }
+
+    .details {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .detail {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .detail strong {
+      color: var(--ink);
+    }
+
+    @media (max-width: 820px) {
+      main {
+        width: min(100% - 20px, 620px);
+        padding: 18px 0;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .left {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .student-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .left,
+      .right {
+        padding: 20px;
+      }
+
+      .top {
+        display: grid;
+      }
+
+      .head {
+        display: none;
+      }
+
+      .score-row {
+        grid-template-columns: 1fr 76px 38px;
+        gap: 8px;
+        padding: 10px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="app" aria-label="Student grade calculator">
+      <div class="left">
+        <div class="top">
+          <div>
+            <h1>Student Grade Calculator</h1>
+            <p>Input scores, compute the average, and get a Passed or Failed remark.</p>
+          </div>
+          <div class="pill" id="scoreCount">3 scores</div>
+        </div>
+
+        <div class="student-grid">
+          <label>
+            Student name
+            <input id="studentName" type="text" placeholder="e.g. Alex Rivera">
+          </label>
+          <label>
+            Passing grade
+            <input id="passingGrade" type="number" min="0" max="100" value="75">
+          </label>
+        </div>
+
+        <div class="table">
+          <div class="head" aria-hidden="true">
+            <span>Subject</span>
+            <span>Score</span>
+            <span></span>
+          </div>
+          <div id="scoreRows"></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="primary" id="addScore">Add Score</button>
+          <button type="button" class="secondary" id="resetScores">Reset</button>
+        </div>
+        <div class="warning" id="warning" role="status" aria-live="polite"></div>
+      </div>
+
+      <aside class="right">
+        <div class="meter" id="meter" style="--angle: 0deg">
+          <div class="meter-inner">
+            <div>
+              <div class="average" id="average">0</div>
+              <div class="average-label">Average</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="remark" id="remark">Ready</div>
+
+        <div class="details">
+          <div class="detail">
+            <span>Student</span>
+            <strong id="studentOutput">Unnamed</strong>
+          </div>
+          <div class="detail">
+            <span>Highest</span>
+            <strong id="highestScore">0</strong>
+          </div>
+          <div class="detail">
+            <span>Lowest</span>
+            <strong id="lowestScore">0</strong>
+          </div>
+          <div class="detail">
+            <span>Valid scores</span>
+            <strong id="validScores">0</strong>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const scoreRows = document.querySelector("#scoreRows");
+    const studentName = document.querySelector("#studentName");
+    const passingGrade = document.querySelector("#passingGrade");
+    const addScore = document.querySelector("#addScore");
+    const resetScores = document.querySelector("#resetScores");
+    const warning = document.querySelector("#warning");
+    const averageOutput = document.querySelector("#average");
+    const remark = document.querySelector("#remark");
+    const meter = document.querySelector("#meter");
+    const scoreCount = document.querySelector("#scoreCount");
+    const studentOutput = document.querySelector("#studentOutput");
+    const highestScore = document.querySelector("#highestScore");
+    const lowestScore = document.querySelector("#lowestScore");
+    const validScores = document.querySelector("#validScores");
+
+    const defaultScores = [
+      ["Mathematics", 90],
+      ["Science", 85],
+      ["English", 80]
+    ];
+
+    function createScoreRow(subject = "", score = "") {
+      const row = document.createElement("div");
+      row.className = "score-row";
+
+      const subjectInput = document.createElement("input");
+      subjectInput.type = "text";
+      subjectInput.placeholder = "Subject";
+      subjectInput.value = subject;
+      subjectInput.setAttribute("aria-label", "Subject");
+
+      const scoreInput = document.createElement("input");
+      scoreInput.type = "number";
+      scoreInput.min = "0";
+      scoreInput.max = "100";
+      scoreInput.placeholder = "0";
+      scoreInput.value = score;
+      scoreInput.setAttribute("aria-label", "Score");
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "remove";
+      removeButton.title = "Remove score";
+      removeButton.setAttribute("aria-label", "Remove score");
+      removeButton.textContent = "x";
+
+      subjectInput.addEventListener("input", calculate);
+      scoreInput.addEventListener("input", calculate);
+      removeButton.addEventListener("click", () => {
+        if (scoreRows.children.length === 1) {
+          warning.textContent = "Keep at least one score row.";
+          return;
+        }
+        row.remove();
+        calculate();
+      });
+
+      row.append(subjectInput, scoreInput, removeButton);
+      scoreRows.append(row);
+    }
+
+    function readScores() {
+      return [...scoreRows.querySelectorAll('input[type="number"]')]
+        .map((input) => Number(input.value))
+        .filter((score) => Number.isFinite(score) && score >= 0 && score <= 100);
+    }
+
+    function calculate() {
+      const scores = readScores();
+      const passMark = Math.min(100, Math.max(0, Number(passingGrade.value) || 0));
+      const average = scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0;
+      const roundedAverage = Math.round(average * 10) / 10;
+      const passed = scores.length > 0 && average >= passMark;
+
+      averageOutput.textContent = roundedAverage.toString();
+      meter.style.setProperty("--angle", `${Math.min(100, average) * 3.6}deg`);
+      remark.textContent = scores.length === 0 ? "Ready" : passed ? "Passed" : "Failed";
+      remark.classList.toggle("failed", scores.length > 0 && !passed);
+      studentOutput.textContent = studentName.value.trim() || "Unnamed";
+      highestScore.textContent = scores.length ? Math.max(...scores).toString() : "0";
+      lowestScore.textContent = scores.length ? Math.min(...scores).toString() : "0";
+      validScores.textContent = scores.length.toString();
+      scoreCount.textContent = `${scoreRows.children.length} ${scoreRows.children.length === 1 ? "score" : "scores"}`;
+
+      const hasInvalidScore = [...scoreRows.querySelectorAll('input[type="number"]')]
+        .some((input) => input.value !== "" && (Number(input.value) < 0 || Number(input.value) > 100));
+      warning.textContent = hasInvalidScore ? "Scores must be from 0 to 100. Invalid scores are not included." : "";
+    }
+
+    addScore.addEventListener("click", () => {
+      createScoreRow();
+      calculate();
+      scoreRows.lastElementChild.querySelector("input").focus();
+    });
+
+    resetScores.addEventListener("click", () => {
+      studentName.value = "";
+      passingGrade.value = "75";
+      scoreRows.replaceChildren();
+      defaultScores.forEach(([subject, score]) => createScoreRow(subject, score));
+      calculate();
+    });
+
+    studentName.addEventListener("input", calculate);
+    passingGrade.addEventListener("input", calculate);
+
+    defaultScores.forEach(([subject, score]) => createScoreRow(subject, score));
+    calculate();
+  </script>
+</body>
+</html>
